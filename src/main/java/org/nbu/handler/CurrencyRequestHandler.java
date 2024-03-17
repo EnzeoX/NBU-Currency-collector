@@ -28,15 +28,13 @@ public class CurrencyRequestHandler {
         return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 
-    public ResponseEntity<List<CurrencyDto>> getAllCurrencyByDate(String date) {
-        LocalDate providedDate = LocalDate.parse(date);
-        List<CurrencyDto> collectedData = currencyService.getCurrencyByDate(providedDate);
+    public ResponseEntity<List<CurrencyDto>> getAllCurrencyByDate(LocalDate date) {
+        List<CurrencyDto> collectedData = currencyService.getCurrencyByDate(date);
         return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 
-    public ResponseEntity<ServiceResponse> deleteCurrencyByDate(String date) {
-        LocalDate providedDate = LocalDate.parse(date);
-        currencyService.deleteCurrencyDataByDate(providedDate);
+    public ResponseEntity<ServiceResponse> deleteCurrencyByDate(LocalDate date) {
+        currencyService.deleteCurrencyDataByDate(date);
         ServiceResponse response = new ServiceResponse();
         response.setStatus("OK");
         response.setMessage(String.format("Data deletion by provided date %s successful", date));
