@@ -1,4 +1,4 @@
-package org.nbu.nbucurrencycollector;
+package org.nbu;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
