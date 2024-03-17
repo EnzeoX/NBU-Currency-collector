@@ -18,14 +18,20 @@ public class DataControllerExceptionAdvice {
     @ExceptionHandler({Exception.class})
     public ResponseEntity<?> handleException(Exception e) {
         String errorName = e.getClass().getSimpleName();
-        log.error("Error occurred, catching in Controller Advice, message: {}", e.getMessage());
+        log.error("Error occurred, catching in Controller Advice, Exception type: {}, message: {}",
+                errorName,
+                e.getMessage());
         ServiceResponse serviceResponse = new ServiceResponse();
         serviceResponse.setStatus("ERROR");
-        serviceResponse.setMessage(e.getMessage());
         switch (errorName) {
+            case "MethodArgumentTypeMismatchException":
+                serviceResponse.setMessage("Can't parse provided URL parameter");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(serviceResponse);
             case "NullPointerException":
+                serviceResponse.setMessage(e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(serviceResponse);
             default:
+                serviceResponse.setMessage(e.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(serviceResponse);
         }
     }
