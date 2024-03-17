@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,22 +38,23 @@ public class NbuService {
     private final Map<LocalDate, List<NbuDataModel>> updatingData = new ConcurrentHashMap<>();
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    private final DateTimeFormatter nbuFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     public List<NbuDto> getAllCurrency() {
-        LocalDate dateNow = LocalDate.now();
-        DayOfWeek dayOfWeek = dateNow.getDayOfWeek();
-        if (dayOfWeek.getValue() >= 5 && dayOfWeek.getValue() <= 7) {
-            dateNow = dateNow.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        }
-        return getCurrencyByDate(dateNow);
+        return getCurrencyByDate(LocalDate.now());
     }
 
     public List<NbuDto> getCurrencyByDate(LocalDate date) {
         Objects.requireNonNull(date, "Provided date is empty or null");
+        date = validateDate(date);
         if (isCurrencyByDateInDB.contains(date)) {
             log.info("Getting data from Database for date of {}", date);
             List<NbuDto> result = getLocalDataDto(date);
             if (result.size() == 0) {
                 log.warn("No data collected from database for date {}, is it still there?", date);
+                if (!repository.existsByExchangeDate(date)) {
+                    return processFromNbu(date);
+                }
             }
             return result;
         } else if (repository.existsByExchangeDate(date)) {
@@ -64,40 +66,54 @@ public class NbuService {
             }
             return result;
         } else {
-            if (updatingData.containsKey(date)) {
-                LocalDateTime now = LocalDateTime.now();
-                return updatingData.get(date)
-                        .stream()
-                        .map(model -> DataMapper.nbuModelToDto(model, now))
-                        .toList();
-            } else {
-                log.info("Requested currency data for date of {} is not in database", date);
-                List<NbuDataModel> dataModels = getDataFromNbu(date);
-                if (dataModels.size() == 0) {
-                    log.warn("Nothing was collected from NBU");
-                    return new ArrayList<>();
-                }
-                updatingData.put(date, dataModels);
-                LocalDateTime now = LocalDateTime.now();
-                executorService.submit(() -> {
-                    List<NbuDataEntity> entityList = dataModels
-                            .stream()
-                            .map(model -> DataMapper.nbuModelToEntity(model, now))
-                            .toList();
-                    repository.saveAll(entityList);
-                    updatingData.remove(date);
-                    isCurrencyByDateInDB.add(date);
-                });
-                return dataModels.stream()
-                        .map(model -> DataMapper.nbuModelToDto(model, now))
-                        .toList();
+            return processFromNbu(date);
+        }
+    }
+
+    public void deleteCurrencyDataByDate(String date) {
+        Objects.requireNonNull(date, "Provided date is null or empty");
+        LocalDate localDate = LocalDate.parse(date);
+        localDate = validateDate(localDate);
+        repository.deleteAllByExchangeDate(localDate);
+        isCurrencyByDateInDB.remove(localDate);
+    }
+
+    private List<NbuDto> processFromNbu(LocalDate date) {
+        if (updatingData.containsKey(date)) {
+            LocalDateTime now = LocalDateTime.now();
+            return updatingData.get(date)
+                    .stream()
+                    .map(model -> DataMapper.nbuModelToDto(model, now))
+                    .toList();
+        } else {
+            log.info("Requested currency data for date of {} is not in database", date);
+            List<NbuDataModel> dataModels = getDataFromNbu(date);
+            if (dataModels.size() == 0) {
+                log.warn("Nothing was collected from NBU");
+                return new ArrayList<>();
             }
+            updatingData.put(date, dataModels);
+            LocalDateTime now = LocalDateTime.now();
+            executorService.submit(() -> {
+                List<NbuDataEntity> entityList = dataModels
+                        .stream()
+                        .map(model -> DataMapper.nbuModelToEntity(model, now))
+                        .toList();
+                repository.saveAll(entityList);
+                isCurrencyByDateInDB.add(date);
+                updatingData.remove(date);
+            });
+            return dataModels.stream()
+                    .map(model -> DataMapper.nbuModelToDto(model, now))
+                    .toList();
         }
     }
 
     private List<NbuDataModel> getDataFromNbu(LocalDate date) {
         ResponseEntity<Object[]> listOfData = new RestTemplate()
-                .getForEntity("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json", Object[].class);
+                .getForEntity(
+                        String.format("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=%s&json", date.format(nbuFormatter)),
+                        Object[].class);
         if (listOfData.getBody() == null) {
             log.warn("Request to NBU returned nothing");
             return new ArrayList<>();
@@ -119,4 +135,11 @@ public class NbuService {
                 .toList();
     }
 
+    private LocalDate validateDate(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek.getValue() >= 5 && dayOfWeek.getValue() <= 7) {
+            date = date.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        }
+        return date;
+    }
 }
