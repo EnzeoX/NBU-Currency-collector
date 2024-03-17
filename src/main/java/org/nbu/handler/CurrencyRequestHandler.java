@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nbu.dto.NbuDto;
 import org.nbu.models.NbuDataModel;
+import org.nbu.models.ServiceResponse;
 import org.nbu.service.NbuService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,12 +29,17 @@ public class CurrencyRequestHandler {
         return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 
-    public List<NbuDto> getAllCurrencyByDate(String date) {
-
-        return null;
+    public ResponseEntity<List<NbuDto>> getAllCurrencyByDate(String date) {
+        LocalDate providedDate = LocalDate.parse(date);
+        List<NbuDto> collectedData = nbuService.getCurrencyByDate(providedDate);
+        return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 
-    public void deleteCurrencyByDate(String date) {
-
+    public ResponseEntity<ServiceResponse> deleteCurrencyByDate(String date) {
+        nbuService.deleteCurrencyDataByDate(date);
+        ServiceResponse response = new ServiceResponse();
+        response.setStatus("OK");
+        response.setMessage(String.format("Data deletion by provided date %s successful", date));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
