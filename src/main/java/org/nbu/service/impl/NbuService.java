@@ -1,13 +1,15 @@
-package org.nbu.service;
+package org.nbu.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.nbu.dto.NbuDto;
+import org.nbu.dto.CurrencyDto;
 import org.nbu.entity.NbuDataEntity;
 import org.nbu.models.NbuDataModel;
 import org.nbu.repository.NbuDataRepository;
+import org.nbu.service.ICurrencyService;
 import org.nbu.utils.DataMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -28,8 +30,9 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
+@Profile("{dev}")
 @AllArgsConstructor
-public class NbuService {
+public class NbuService implements ICurrencyService<List<CurrencyDto>, LocalDate> {
 
     private final ObjectMapper mapper;
     private final NbuDataRepository repository;
@@ -40,16 +43,18 @@ public class NbuService {
 
     private final DateTimeFormatter nbuFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    public List<NbuDto> getAllCurrency() {
+    @Override
+    public List<CurrencyDto> getAllCurrency() {
         return getCurrencyByDate(LocalDate.now());
     }
 
-    public List<NbuDto> getCurrencyByDate(LocalDate date) {
+    @Override
+    public List<CurrencyDto> getCurrencyByDate(LocalDate date) {
         Objects.requireNonNull(date, "Provided date is empty or null");
         date = validateDate(date);
         if (isCurrencyByDateInDB.contains(date)) {
             log.info("Getting data from Database for date of {}", date);
-            List<NbuDto> result = getLocalDataDto(date);
+            List<CurrencyDto> result = getLocalDataDto(date);
             if (result.size() == 0) {
                 log.warn("No data collected from database for date {}, is it still there?", date);
                 if (!repository.existsByExchangeDate(date)) {
@@ -60,7 +65,7 @@ public class NbuService {
         } else if (repository.existsByExchangeDate(date)) {
             log.info("Data exists in Database for date {}, but not marked", date);
             isCurrencyByDateInDB.add(date);
-            List<NbuDto> result = getLocalDataDto(date);
+            List<CurrencyDto> result = getLocalDataDto(date);
             if (result.size() == 0) {
                 log.warn("No data collected from database for date {}, is it still there?", date);
             }
@@ -70,15 +75,15 @@ public class NbuService {
         }
     }
 
-    public void deleteCurrencyDataByDate(String date) {
+    @Override
+    public void deleteCurrencyDataByDate(LocalDate date) {
         Objects.requireNonNull(date, "Provided date is null or empty");
-        LocalDate localDate = LocalDate.parse(date);
-        localDate = validateDate(localDate);
-        repository.deleteAllByExchangeDate(localDate);
-        isCurrencyByDateInDB.remove(localDate);
+        date = validateDate(date);
+        repository.deleteAllByExchangeDate(date);
+        isCurrencyByDateInDB.remove(date);
     }
 
-    private List<NbuDto> processFromNbu(LocalDate date) {
+    private List<CurrencyDto> processFromNbu(LocalDate date) {
         if (updatingData.containsKey(date)) {
             LocalDateTime now = LocalDateTime.now();
             return updatingData.get(date)
@@ -128,7 +133,7 @@ public class NbuService {
                 .orElseThrow(() -> new NullPointerException(String.format("No data by date %s found in database", date)));
     }
 
-    private List<NbuDto> getLocalDataDto(LocalDate date) {
+    private List<CurrencyDto> getLocalDataDto(LocalDate date) {
         return getLocalData(date)
                 .stream()
                 .map(DataMapper::nbuEntityToDto)

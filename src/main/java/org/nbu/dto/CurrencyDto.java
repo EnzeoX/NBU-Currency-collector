@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class NbuDto {
+public class CurrencyDto {
 
     @JsonProperty("r030")
     private String r030;

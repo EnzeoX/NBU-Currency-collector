@@ -1,10 +1,9 @@
 package org.nbu.utils;
 
-import org.nbu.dto.NbuDto;
+import org.nbu.dto.CurrencyDto;
 import org.nbu.entity.NbuDataEntity;
 import org.nbu.models.NbuDataModel;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -25,9 +24,9 @@ public class DataMapper {
                 .build();
     }
 
-    public static NbuDto nbuEntityToDto(NbuDataEntity entity) {
+    public static CurrencyDto nbuEntityToDto(NbuDataEntity entity) {
         Objects.requireNonNull(entity, "Provided entity is null or empty");
-        return NbuDto.builder()
+        return CurrencyDto.builder()
                 .r030(entity.getR030())
                 .txt(entity.getTxt())
                 .rate(entity.getRate())
@@ -37,7 +36,7 @@ public class DataMapper {
                 .build();
     }
 
-    public static NbuDataEntity nbuDtoToEntity(NbuDto dto) {
+    public static NbuDataEntity nbuDtoToEntity(CurrencyDto dto) {
         Objects.requireNonNull(dto, "Provided dto is null or empty");
         return NbuDataEntity.builder()
                 .r030(dto.getR030())
@@ -49,9 +48,9 @@ public class DataMapper {
                 .build();
     }
 
-    public static NbuDto nbuModelToDto(NbuDataModel model, LocalDateTime now) {
+    public static CurrencyDto nbuModelToDto(NbuDataModel model, LocalDateTime now) {
         Objects.requireNonNull(model, "Provided model is null or empty");
-        return NbuDto.builder()
+        return CurrencyDto.builder()
                 .r030(model.getR030())
                 .txt(model.getTxt())
                 .rate(model.getRate())

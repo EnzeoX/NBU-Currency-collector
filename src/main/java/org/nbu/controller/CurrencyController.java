@@ -3,9 +3,8 @@ package org.nbu.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.nbu.dto.NbuDto;
+import org.nbu.dto.CurrencyDto;
 import org.nbu.handler.CurrencyRequestHandler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class CurrencyController {
     private final CurrencyRequestHandler requestHandler;
 
     @GetMapping("/get")
-    public ResponseEntity<List<NbuDto>> getActualCurrency(HttpServletRequest request) {
+    public ResponseEntity<List<CurrencyDto>> getActualCurrency(HttpServletRequest request) {
         log.info("Request to get actual currency info by date. Request from {}", request.getRemoteAddr());
         return requestHandler.getAllCurrency();
     }
