@@ -31,7 +31,7 @@ public class NbuDataEntity {
     @Column(name = "txt", nullable = false)
     private String txt;
 
-    @Column(name = "rate", nullable = false)
+    @Column(name = "rate", nullable = false, columnDefinition = "DOUBLE PRECISION")
     private BigDecimal rate;
 
     @Column(name = "cc", nullable = false)
