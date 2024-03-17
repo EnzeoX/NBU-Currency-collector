@@ -6,6 +6,7 @@ import org.nbu.dto.CurrencyDto;
 import org.nbu.models.NbuDataModel;
 import org.nbu.service.ICurrencyService;
 import org.nbu.utils.DataMapper;
+import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,22 @@ public class MockCurrencyService implements ICurrencyService<List<CurrencyDto>, 
             NbuDataModel[] models = mapper.readValue(getClass().getResource("/static/mock-currency.json"), NbuDataModel[].class);
             if (models.length > 0) {
                 log.info("File read successful. Total size: {}", models.length);
-                List<NbuDataModel> list = Arrays.asList(models);
-                data.put(list.get(0).getExchangeDate(), list);
+                for (NbuDataModel model : models) {
+                    if (model != null) {
+                        if (!data.containsKey(model.getExchangeDate())) {
+                            List<NbuDataModel> list = new ArrayList<>();
+                            list.add(model);
+                            data.put(model.getExchangeDate(), list);
+                        } else {
+                            data.get(model.getExchangeDate()).add(model);
+                        }
+                    }
+                }
                 log.info("Data successfully added to map");
+                log.info("Total Dates size: {}", data.size());
+                for (Map.Entry<LocalDate, List<NbuDataModel>> entry : data.entrySet()) {
+                    log.info(" - Date: {}; List size: {}", entry.getKey(), entry.getValue().size());
+                }
             }
         } catch (IOException e) {
             log.error("Error occurred while trying to read mocked data. Message: {}", e.getMessage());
