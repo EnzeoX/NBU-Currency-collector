@@ -53,7 +53,7 @@ public class NbuService implements CurrencyService<LocalDate> {
 
     @Override
     public List<CurrencyDto> getAllCurrency() {
-        return getCurrencyByDate(LocalDate.now());
+        return getCurrencyByDate(adjustDate(LocalDate.now()));
     }
 
     @Override
@@ -154,5 +154,9 @@ public class NbuService implements CurrencyService<LocalDate> {
             date = date.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         }
         return date;
+    }
+
+    private LocalDate adjustDate(LocalDate date) {
+        return date.plusDays(1);
     }
 }
