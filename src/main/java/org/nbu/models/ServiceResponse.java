@@ -20,10 +20,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ServiceResponse {
 
-    @JsonProperty("message")
     private String message;
 
-    @JsonProperty("status")
     private String status;
 
     @JsonProperty("time")
