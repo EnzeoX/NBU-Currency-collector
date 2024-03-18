@@ -9,20 +9,20 @@ Simple REST service to collect, store and return currency values from NBU (Natio
 
 ## Run Locally
 
-###Clone the project
+### Clone the project
 
 ```bash
   git clone https://github.com/EnzeoX/NBU-Currency-collector
 ```
 
-###Go to the project
+### Go to the project
 
 ```bash
   mvn package
 ```
 
 
-###Run application
+### Run application
 
 ```bash
   java -jar *application_name*.jar --spring.profiles.active=*selected_profile*
