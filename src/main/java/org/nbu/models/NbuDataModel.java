@@ -22,16 +22,12 @@ import java.time.LocalDate;
 @Setter
 public class NbuDataModel {
 
-    @JsonProperty("r030")
     private String r030;
 
-    @JsonProperty("txt")
     private String txt;
 
-    @JsonProperty("rate")
     private BigDecimal rate;
 
-    @JsonProperty("cc")
     private String cc;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
