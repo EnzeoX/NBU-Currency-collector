@@ -23,16 +23,12 @@ import java.time.LocalDateTime;
 @Builder
 public class CurrencyDto {
 
-    @JsonProperty("r030")
     private String r030;
 
-    @JsonProperty("txt")
     private String txt;
 
-    @JsonProperty("rate")
     private BigDecimal rate;
 
-    @JsonProperty("cc")
     private String cc;
 
     @JsonProperty("exchangedate")
