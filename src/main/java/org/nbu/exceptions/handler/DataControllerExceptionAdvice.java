@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class DataControllerExceptionAdvice {
 
+    // in future add custom exceptions and handle them here if service
     @ExceptionHandler({Exception.class})
     public ResponseEntity<?> handleException(Exception e) {
         String errorName = e.getClass().getSimpleName();
@@ -24,15 +25,18 @@ public class DataControllerExceptionAdvice {
         ServiceResponse serviceResponse = new ServiceResponse();
         serviceResponse.setStatus("ERROR");
         switch (errorName) {
-            case "MethodArgumentTypeMismatchException":
+            case "MethodArgumentTypeMismatchException" -> {
                 serviceResponse.setMessage("Can't parse provided URL parameter");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(serviceResponse);
-            case "NullPointerException":
+            }
+            case "NullPointerException" -> {
                 serviceResponse.setMessage(e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(serviceResponse);
-            default:
+            }
+            default -> {
                 serviceResponse.setMessage(e.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(serviceResponse);
+            }
         }
     }
 }
