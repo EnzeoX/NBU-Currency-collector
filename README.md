@@ -39,7 +39,9 @@ _Available profiles:_
   GET api/v1/currency/get
 ```
 
-Response with JSON body with list of currency data Example of data:
+Response with JSON body with list of currency data.
+
+Example of data:
 
 ```json
     [{
