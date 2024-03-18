@@ -1,6 +1,6 @@
-# NBU-Currency-collector
+# NBU Currency collector
 
-Simple REST service to collect, store and return currency values from NBU
+Simple REST service to collect, store and return currency values from NBU (National Bank of Ukraine)
 
 ## Features
 
@@ -9,26 +9,27 @@ Simple REST service to collect, store and return currency values from NBU
 
 ## Run Locally
 
-Clone the project
+###Clone the project
 
 ```bash
   git clone https://github.com/EnzeoX/NBU-Currency-collector
 ```
 
-Go to the project
+###Go to the project
 
 ```bash
-  mvn package -Dspring-boot.run.profiles=*selected_profile*
+  mvn package
 ```
-Available profiles:
- - dev
- - mock
 
-Run application
+
+###Run application
 
 ```bash
-  java -jar *application_name*.jar
+  java -jar *application_name*.jar --spring.profiles.active=*selected_profile*
 ```
+_Available profiles:_
+- _dev_
+- _mock_
 
 ## API Reference
 
@@ -58,8 +59,10 @@ Response with JSON body with list of currency data Example of data:
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `date` | `LocalDate` | **Required**. Date in format yyyy-MM-dd |
-if data is available for provided date - response with JSON body with list of currency data Example of data:
 
+if data is available for provided date - response with list of JSON currency data.
+
+Example of data:
 ```json
     [{
       "r030": NUMBER,
@@ -81,7 +84,7 @@ if not - response with empty JSON "[]"
 | :-------- | :------- | :------------------------- |
 | `date` | `LocalDate` | **Required**. Date in format yyyy-MM-dd |
 
-In success - Response with JSON body:
+In success - Response with list of JSON objects:
 
 ```json
     [{
@@ -90,3 +93,19 @@ In success - Response with JSON body:
       "time": LocalDateTime
     }]
 ```
+
+### Error responses
+
+If any error occurred while requesting for a currency data - service will return a json with status, error message and time.
+
+Example of response json:
+
+```json
+    [{
+      "status": STRING,
+      "message": STRING,
+      "time": LocalDateTime
+    }]
+```
+
+
