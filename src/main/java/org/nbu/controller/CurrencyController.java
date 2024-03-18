@@ -25,21 +25,21 @@ public class CurrencyController {
     private final CurrencyRequestHandler requestHandler;
 
     @GetMapping("/get")
-    public ResponseEntity<List<CurrencyDto>> getActualCurrency(HttpServletRequest request) {
+    public ResponseEntity<List<CurrencyDto>> getActualCurrency(HttpServletRequest request) { // in future add request logging in Interceptor
         log.info("Request to get actual currency info by date. Request from {}", request.getRemoteAddr());
         return requestHandler.getAllCurrency();
     }
 
     @GetMapping("/get/by-date/{date}")
     public ResponseEntity<?> getAllCurrencyByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                                  HttpServletRequest request) {
+                                                  HttpServletRequest request) { // in future add request logging in Interceptor
         log.info("Request to get currency info by date. Request from {}", request.getRemoteAddr());
         return requestHandler.getAllCurrencyByDate(date);
     }
 
     @PostMapping("/delete/by-date/{date}")
     public ResponseEntity<?> deleteCurrencyByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                                  HttpServletRequest request) {
+                                                  HttpServletRequest request) { // in future add request logging in Interceptor
         log.info("Request to delete currency info by date. Request from {}", request.getRemoteAddr());
         return requestHandler.deleteCurrencyByDate(date);
     }
