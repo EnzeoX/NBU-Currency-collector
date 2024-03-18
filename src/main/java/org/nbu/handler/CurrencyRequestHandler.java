@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nbu.dto.CurrencyDto;
 import org.nbu.models.ServiceResponse;
-import org.nbu.service.ICurrencyService;
+import org.nbu.service.CurrencyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CurrencyRequestHandler {
 
-    private final ICurrencyService<List<CurrencyDto>, LocalDate> currencyService;
+    private final CurrencyService<LocalDate> currencyService;
 
     public ResponseEntity<List<CurrencyDto>> getAllCurrency() {
         List<CurrencyDto> collectedData = currencyService.getAllCurrency();
@@ -33,6 +33,7 @@ public class CurrencyRequestHandler {
         return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 
+    // in future - make additional response if provided date is not in Database
     public ResponseEntity<ServiceResponse> deleteCurrencyByDate(LocalDate date) {
         currencyService.deleteCurrencyDataByDate(date);
         ServiceResponse response = new ServiceResponse();
