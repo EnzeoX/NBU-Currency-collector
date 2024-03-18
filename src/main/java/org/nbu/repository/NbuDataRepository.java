@@ -4,7 +4,6 @@ import org.nbu.entity.NbuDataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +22,8 @@ public interface NbuDataRepository extends JpaRepository<NbuDataEntity, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END FROM nbu_data_table WHERE exchange_date=:date", nativeQuery = true)
     boolean existsByExchangeDate(LocalDate date);
 
-    @Transactional
     void deleteAllByExchangeDate(LocalDate date);
+
+    @Query(value = "SELECT DISTINCT ON (exchange_date) * FROM nbu_data_table", nativeQuery = true)
+    List<NbuDataEntity> getAvailableDates();
 }
