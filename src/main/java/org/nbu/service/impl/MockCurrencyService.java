@@ -4,20 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.nbu.dto.CurrencyDto;
 import org.nbu.models.NbuDataModel;
-import org.nbu.service.ICurrencyService;
+import org.nbu.service.CurrencyService;
 import org.nbu.utils.DataMapper;
-import org.springframework.cglib.core.Local;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,9 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @Slf4j
-@Service
-@Profile("{mock}")
-public class MockCurrencyService implements ICurrencyService<List<CurrencyDto>, LocalDate> {
+public class MockCurrencyService implements CurrencyService<LocalDate> {
 
     private final Map<LocalDate, List<NbuDataModel>> data = new ConcurrentHashMap<>();
 
