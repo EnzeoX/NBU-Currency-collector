@@ -1,17 +1,16 @@
 package org.nbu.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nbu.dto.CurrencyDto;
 import org.nbu.entity.NbuDataEntity;
 import org.nbu.models.NbuDataModel;
 import org.nbu.repository.NbuDataRepository;
-import org.nbu.service.ICurrencyService;
+import org.nbu.service.CurrencyService;
 import org.nbu.utils.DataMapper;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.DayOfWeek;
@@ -29,10 +28,8 @@ import java.util.concurrent.Executors;
  */
 
 @Slf4j
-@Service
-@Profile("{dev}")
 @AllArgsConstructor
-public class NbuService implements ICurrencyService<List<CurrencyDto>, LocalDate> {
+public class NbuService implements CurrencyService<LocalDate> {
 
     private final ObjectMapper mapper;
     private final NbuDataRepository repository;
@@ -42,6 +39,17 @@ public class NbuService implements ICurrencyService<List<CurrencyDto>, LocalDate
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private final DateTimeFormatter nbuFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    @PostConstruct
+    private void init() {
+        List<NbuDataEntity> availableDates = this.repository.getAvailableDates();
+        if (availableDates.size() == 0) {
+            log.warn("No data in database");
+            return;
+        }
+        availableDates.forEach(date -> isCurrencyByDateInDB.add(date.getExchangeDate()));
+        log.info("Added available dates to database. List size: {}", this.isCurrencyByDateInDB.size());
+    }
 
     @Override
     public List<CurrencyDto> getAllCurrency() {
