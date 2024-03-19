@@ -24,7 +24,7 @@ public class CurrencyRequestHandler {
     private final CurrencyService<LocalDate> currencyService;
 
     public ResponseEntity<List<CurrencyDto>> getAllCurrency() {
-        List<CurrencyDto> collectedData = currencyService.getAllCurrency();
+        List<CurrencyDto> collectedData = currencyService.getActualCurrency();
         return ResponseEntity.status(HttpStatus.OK).body(collectedData);
     }
 

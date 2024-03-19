@@ -52,9 +52,8 @@ public class NbuService implements CurrencyService<LocalDate> {
     }
 
     @Override
-    public List<CurrencyDto> getAllCurrency() {
-        LocalDate now = LocalDate.now();
-        return getCurrencyByDate(validateDate(now));
+    public List<CurrencyDto> getActualCurrency() {
+        return getCurrencyByDate(validateDate(LocalDate.now()));
     }
 
     @Override
@@ -154,7 +153,8 @@ public class NbuService implements CurrencyService<LocalDate> {
         if (dayOfWeek.getValue() >= 5 && dayOfWeek.getValue() <= 7) {
             date = date.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         } else {
-            if (now.getHour() >= 15 && now.getMinute() >= 30) {
+            // checking if current time is after 15:30 cuz after that time currency data updates and sets as for tomorrow
+            if (now.isAfter(LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 15, 30))) {
                date = adjustDate(date);
             }
         }
