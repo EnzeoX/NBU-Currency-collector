@@ -11,7 +11,7 @@ import java.util.List;
 @Transactional
 public interface CurrencyService<R> {
 
-    List<CurrencyDto> getAllCurrency();
+    List<CurrencyDto> getActualCurrency();
 
     List<CurrencyDto> getCurrencyByDate(R date);
 

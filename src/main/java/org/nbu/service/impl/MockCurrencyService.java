@@ -61,7 +61,7 @@ public class MockCurrencyService implements CurrencyService<LocalDate> {
     }
 
     @Override
-    public List<CurrencyDto> getAllCurrency() {
+    public List<CurrencyDto> getActualCurrency() {
         return getCurrencyByDate(LocalDate.now());
     }
 

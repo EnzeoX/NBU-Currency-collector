@@ -52,9 +52,8 @@ public class NbuService implements CurrencyService<LocalDate> {
     }
 
     @Override
-    public List<CurrencyDto> getAllCurrency() {
-        LocalDate now = LocalDate.now();
-        return getCurrencyByDate(validateDate(now));
+    public List<CurrencyDto> getActualCurrency() {
+        return getCurrencyByDate(validateDate(LocalDate.now()));
     }
 
     @Override
