@@ -53,13 +53,13 @@ public class NbuService implements CurrencyService<LocalDate> {
 
     @Override
     public List<CurrencyDto> getAllCurrency() {
-        return getCurrencyByDate(adjustDate(LocalDate.now()));
+        LocalDate now = LocalDate.now();
+        return getCurrencyByDate(validateDate(now));
     }
 
     @Override
     public List<CurrencyDto> getCurrencyByDate(LocalDate date) {
         Objects.requireNonNull(date, "Provided date is empty or null");
-        date = validateDate(date);
         if (isCurrencyByDateInDB.contains(date)) {
             log.info("Getting data from Database for date of {}", date);
             List<CurrencyDto> result = getLocalDataDto(date);
@@ -149,9 +149,14 @@ public class NbuService implements CurrencyService<LocalDate> {
     }
 
     private LocalDate validateDate(LocalDate date) {
+        LocalDateTime now = LocalDateTime.now();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (dayOfWeek.getValue() >= 5 && dayOfWeek.getValue() <= 7) {
             date = date.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        } else {
+            if (now.getHour() >= 15 && now.getMinute() >= 30) {
+               date = adjustDate(date);
+            }
         }
         return date;
     }
